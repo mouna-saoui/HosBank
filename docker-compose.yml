@@ -1,0 +1,37 @@
+services:
+
+  node:
+    build: .
+    container_name: HosBank
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+
+
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: hosbank-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PW}
+      POSTGRES_DB: hosbank
+
+
+  pgadmin:
+    image: dpage/pgadmin4:snapshot
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "hosbank@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PW}
+    ports:
+      - "5555:80"
+    depends_on:
+      - postgres
