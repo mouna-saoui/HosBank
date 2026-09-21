@@ -1,16 +1,16 @@
-const clientRepository = require("../repositories/clientRepository");
+const clientModel = require("../models/clientModel");
 
 async function getDashboard(userId) {
-	const client = await clientRepository.findClientById(userId);
+	const client = await clientModel.findClientById(userId);
 
 	if (!client) {
 		return null;
 	}
 
 	const [accounts, recentTransactions, pendingRequests] = await Promise.all([
-		clientRepository.findAccountsByClientId(userId),
-		clientRepository.findRecentTransactionsByClientId(userId),
-		clientRepository.findPendingRequestsByClientId(userId),
+		clientModel.findAccountsByClientId(userId),
+		clientModel.findRecentTransactionsByClientId(userId),
+		clientModel.findPendingRequestsByClientId(userId),
 	]);
 
 	const totalBalance = accounts.reduce(
