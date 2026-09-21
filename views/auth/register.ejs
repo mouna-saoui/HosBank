@@ -1,20 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Inscription - HosBank</title>
 </head>
 <body>
-  
-    <form action="/auth/login" method="POST">
-        <input type="text" placeholder="Fist Name">
-        <input type="text" placeholder="Last Name">
-        <input type="email" placeholder="Email">
-        <input type="text" placeholder="Phone">
-        <input type="password" placeholder="Password">
-        <input type="password" placeholder="Confirm Password">
-        <button>Register</button>
+    <h1>Créer un compte</h1>
+
+    <% if (error) { %>
+        <p style="color:red;"><%= error %></p>
+    <% } %>
+
+    <form action="/register" method="POST">
+        <label for="firstName">Prénom</label>
+        <input id="firstName" type="text" name="firstName" required>
+
+        <label for="lastName">Nom</label>
+        <input id="lastName" type="text" name="lastName" required>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" required>
+
+        <label for="phone">Téléphone</label>
+        <input id="phone" type="text" name="phone">
+
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" name="password" required>
+
+        <label for="confirmPassword">Confirmer le mot de passe</label>
+        <input id="confirmPassword" type="password" name="confirmPassword" required>
+
+        <button type="submit">S'inscrire</button>
     </form>
+
+    <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
 </body>
-</html> 
+</html>
