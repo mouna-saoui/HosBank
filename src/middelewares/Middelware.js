@@ -6,6 +6,14 @@ function requireAuth(req, res, next) {
 	next();
 }
 
+function requireApiAuth(req, res, next) {
+	if (!req.session || !req.session.userId) {
+		return res.status(401).json({ error: "Authentication required" });
+	}
+
+	next();
+}
+
 function requireRole(roleId) {
 	return function (req, res, next) {
 		if (!req.session || req.session.roleId !== roleId) {
@@ -18,5 +26,6 @@ function requireRole(roleId) {
 
 module.exports = {
 	requireAuth,
+	requireApiAuth,
 	requireRole,
 };
