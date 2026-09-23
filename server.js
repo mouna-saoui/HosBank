@@ -2,6 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const authRoutes = require("./src/routes/Rout");
+const clientRoutes = require("./src/routes/clientRoutes");
 require("dotenv").config();
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(
 );
 
 app.use(authRoutes);
+app.use(clientRoutes);
 
 const port = process.env.PORT || 3000;
 
