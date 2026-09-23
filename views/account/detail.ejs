@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail Compte - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <a href="/accounts" class="btn-link">← Retour</a>
+        <h1><%= account.accountType === 'current' ? 'Compte Courant' : 'Compte Épargne' %></h1>
+    </div>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <div class="detail-card">
+        <div class="detail-row">
+            <span class="label">Numéro de compte</span>
+            <span class="value"><%= account.accountNumber %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">IBAN</span>
+            <span class="value"><%= account.iban %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">RIB</span>
+            <span class="value"><%= account.rib %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Solde</span>
+            <span class="value balance"><%= parseFloat(account.balance).toFixed(2) %> <%= account.currency %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Statut</span>
+            <span class="badge badge-<%= account.status %>">
+                <%= account.status === 'active' ? 'Actif' : account.status === 'blocked' ? 'Bloqué' : 'Clôturé' %>
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Ouvert le</span>
+            <span class="value"><%= new Date(account.createdAt).toLocaleDateString('fr-FR') %></span>
+        </div>
+    </div>
+
+    <% if (account.status === 'active') { %>
+    <form method="POST" action="/accounts/<%= account.id %>/close"
+          onsubmit="return confirm('Confirmer la clôture de ce compte ?')">
+        <button type="submit" class="btn-danger">Clôturer le compte</button>
+    </form>
+    <% } %>
+
+    <h2>Dernières transactions</h2>
+    <% if (transactions.length === 0) { %>
+        <p class="empty-text">Aucune transaction pour ce compte.</p>
+    <% } else { %>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Montant</th>
+                <th>Solde après</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% transactions.forEach(tx => { %>
+            <tr>
+                <td><%= new Date(tx.created_at).toLocaleDateString('fr-FR') %></td>
+                <td><%= tx.transaction_type %></td>
+                <td><%= tx.description || '-' %></td>
+                <td class="<%= tx.amount > 0 ? 'amount-positive' : 'amount-negative' %>">
+                    <%= parseFloat(tx.amount).toFixed(2) %> MAD
+                </td>
+                <td><%= parseFloat(tx.balance_after).toFixed(2) %> MAD</td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% } %>
+</div>
+</body>
+</html>
