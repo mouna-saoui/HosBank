@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau Compte - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="auth-container">
+    <a href="/accounts" class="btn-link">← Retour</a>
+    <h2>Ouvrir un compte bancaire</h2>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/accounts">
+        <div class="form-group">
+            <label>Type de compte</label>
+            <div class="account-type-options">
+                <label class="option-card">
+                    <input type="radio" name="account_type" value="current" required>
+                    <div class="option-content">
+                        <strong>Compte Courant</strong>
+                        <p>Pour vos opérations quotidiennes, virements et paiements.</p>
+                    </div>
+                </label>
+                <label class="option-card">
+                    <input type="radio" name="account_type" value="savings">
+                    <div class="option-content">
+                        <strong>Compte Épargne</strong>
+                        <p>Pour faire fructifier votre argent avec des intérêts.</p>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Ouvrir le compte</button>
+    </form>
+</div>
+</body>
+</html>
