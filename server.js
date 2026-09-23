@@ -1,16 +1,14 @@
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
-require("dotenv").config();
-const authRoutes = require("./src/routes/authRoutes");
+const authRoutes = require("./src/routes/Rout");
 const clientRoutes = require("./src/routes/clientRoutes");
-const beneficiaryRoutes = require("./src/routes/beneficiaryRoutes");
+require("dotenv").config();
 const app = express();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
@@ -23,7 +21,6 @@ app.use(
 
 app.use(authRoutes);
 app.use(clientRoutes);
-app.use(beneficiaryRoutes);
 
 const port = process.env.PORT || 3000;
 
