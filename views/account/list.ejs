@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Comptes - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>Mes Comptes</h1>
+        <div class="header-actions">
+            <a href="/accounts/new" class="btn-primary">+ Nouveau compte</a>
+            <a href="/logout" class="btn-link">Déconnexion</a>
+        </div>
+    </div>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <% if (accounts.length === 0) { %>
+        <div class="empty-state">
+            <p>Vous n'avez aucun compte bancaire.</p>
+            <a href="/accounts/new" class="btn-primary">Créer mon premier compte</a>
+        </div>
+    <% } else { %>
+        <div class="accounts-grid">
+            <% accounts.forEach(account => { %>
+            <div class="account-card status-<%= account.status %>">
+                <div class="account-card-header">
+                    <span class="account-type">
+                        <%= account.accountType === 'current' ? 'Compte Courant' : 'Compte Épargne' %>
+                    </span>
+                    <span class="badge badge-<%= account.status %>">
+                        <%= account.status === 'active' ? 'Actif' : account.status === 'blocked' ? 'Bloqué' : 'Clôturé' %>
+                    </span>
+                </div>
+                <div class="account-number"><%= account.accountNumber %></div>
+                <div class="account-balance">
+                    <%= parseFloat(account.balance).toFixed(2) %> <%= account.currency %>
+                </div>
+                <div class="account-rib">RIB : <%= account.rib %></div>
+                <a href="/accounts/<%= account.id %>" class="btn-secondary">Voir le détail</a>
+            </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+</body>
+</html>
