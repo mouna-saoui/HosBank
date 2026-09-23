@@ -1,4 +1,4 @@
-const clientModel = require("../models/clientModel");
+const clientModel = require("../repositories/clientRepository");
 
 async function getDashboard(userId) {
 	const client = await clientModel.findClientById(userId);
