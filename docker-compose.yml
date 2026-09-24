@@ -26,8 +26,6 @@ services:
     container_name: hosbank-db
     ports:
       - "5432:5432"
-    volumes:
-      - 507221bab9e8e417338c62b124844926dabbdb008e4a7bd286ce770ee43184c1:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PW}
@@ -51,7 +49,3 @@ services:
     depends_on:
       - postgres
 
-
-volumes:
-  507221bab9e8e417338c62b124844926dabbdb008e4a7bd286ce770ee43184c1:
-    external: true
