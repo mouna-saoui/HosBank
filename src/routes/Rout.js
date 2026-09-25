@@ -6,6 +6,7 @@ const compteController = require("../controllers/CompteController");
 const clientController = require("../controllers/clientController");
 const bankRequestController = require("../controllers/bankRequestController");
 const cardController = require("../controllers/cardController");
+const agentRoutes = require("./agentRoutes");
 
 const { requireAuth, requireRole } = require("../middelewares/Middelware");
 
@@ -54,6 +55,9 @@ router.post("/officer/requests/:type/:id/process", agentOrAdmin, bankRequestCont
 // ── Agent / Admin : Cartes ───────────────────────────────
 router.get("/officer/cards", agentOrAdmin, cardController.listAllCards);
 router.post("/officer/cards/:id/status", agentOrAdmin, cardController.updateCardStatus);
+
+// ── Chargé Client : clients affectés ────────────────────
+router.use(agentRoutes);
 
 // ── Default ───────────────────────────────────────────────
 router.get("/", (req, res) => res.redirect("/login"));

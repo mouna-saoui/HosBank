@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes clients - HosBank</title>
+    <link rel="stylesheet" href="/css/agent.css">
+</head>
+<body>
+<main class="agent-page">
+    <header class="agent-header">
+        <div>
+            <p class="eyebrow">HosBank</p>
+            <h1>Mes clients affectés</h1>
+        </div>
+        <a class="button secondary" href="/logout">Déconnexion</a>
+    </header>
+
+    <% if (error) { %>
+        <p class="alert error"><%= error %></p>
+    <% } %>
+
+    <section class="panel">
+        <h2>Clients</h2>
+        <% if (clients.length === 0) { %>
+            <p>Aucun client ne vous est affecté.</p>
+        <% } else { %>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Statut</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% clients.forEach((client) => { %>
+                        <tr>
+                            <td><%= client.last_name %></td>
+                            <td><%= client.first_name %></td>
+                            <td><%= client.email %></td>
+                            <td><%= client.phone || '-' %></td>
+                            <td><span class="status"><%= client.status %></span></td>
+                            <td><a class="button" href="/agent/clients/<%= client.id %>">Consulter</a></td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </section>
+</main>
+</body>
+</html>

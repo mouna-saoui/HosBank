@@ -6,7 +6,7 @@ const SALT_ROUNDS = 10;
 
 const DASHBOARDS = {
     1: "/client/dashboard",
-    2: "/officer/dashboard",
+    2: "/agent/clients",
     3: "/admin/dashboard",
 };
 

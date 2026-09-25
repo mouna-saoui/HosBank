@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client - HosBank</title>
+    <link rel="stylesheet" href="/css/agent.css">
+</head>
+<body>
+<main class="agent-page">
+    <header class="agent-header">
+        <div>
+            <a class="back-link" href="/agent/clients">← Mes clients</a>
+            <h1><%= client.first_name %> <%= client.last_name %></h1>
+            <p><%= client.email %> · <%= client.phone || 'Téléphone non renseigné' %></p>
+        </div>
+        <a class="button secondary" href="/logout">Déconnexion</a>
+    </header>
+
+    <% if (error) { %>
+        <p class="alert error"><%= error %></p>
+    <% } %>
+
+    <section class="panel">
+        <h2>Comptes bancaires</h2>
+        <% if (accounts.length === 0) { %>
+            <p>Ce client n'a aucun compte.</p>
+        <% } else { %>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Numéro</th><th>Type</th><th>IBAN</th><th>RIB</th>
+                            <th>Solde</th><th>Devise</th><th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% accounts.forEach((account) => { %>
+                        <tr>
+                            <td><%= account.account_number %></td>
+                            <td><%= account.account_type %></td>
+                            <td><%= account.iban || '-' %></td>
+                            <td><%= account.rib || '-' %></td>
+                            <td><%= account.balance %></td>
+                            <td><%= account.currency %></td>
+                            <td><span class="status"><%= account.status %></span></td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </section>
+
+    <section class="panel">
+        <h2>Demandes bancaires</h2>
+        <% if (requests.length === 0) { %>
+            <p>Aucune demande pour ce client.</p>
+        <% } %>
+        <% requests.forEach((request) => { %>
+            <article class="item">
+                <div class="item-header">
+                    <div>
+                        <h3>Demande #<%= request.id %> · <%= request.request_type %></h3>
+                        <p>Créée le <%= new Date(request.created_at).toLocaleDateString('fr-FR') %></p>
+                    </div>
+                    <span class="status"><%= request.status %></span>
+                </div>
+                <p>Détails : <%= JSON.stringify(request.details || {}) %></p>
+                <p>Commentaire de traitement : <%= request.resolution_note || '-' %></p>
+
+                <% if (['pending', 'in_progress', 'in_review'].includes(request.status)) { %>
+                    <form class="inline-form" method="POST" action="/agent/clients/<%= client.id %>/requests/<%= request.id %>/status">
+                        <select name="status" required>
+                            <% if (request.status === 'pending') { %><option value="in_progress">En cours</option><% } %>
+                            <% if (request.status === 'pending' || request.status === 'in_progress' || request.status === 'in_review') { %>
+                                <option value="approved">Approuver</option>
+                                <option value="rejected">Refuser</option>
+                            <% } %>
+                        </select>
+                        <input name="resolution_note" placeholder="Commentaire (optionnel)">
+                        <button class="button" type="submit">Mettre à jour</button>
+                    </form>
+                <% } %>
+
+                <div class="comments">
+                    <h4>Commentaires</h4>
+                    <% request.comments.forEach((comment) => { %>
+                        <p><strong><%= comment.first_name %> <%= comment.last_name %></strong> : <%= comment.body %></p>
+                    <% }) %>
+                    <form method="POST" action="/agent/clients/<%= client.id %>/requests/<%= request.id %>/comments">
+                        <textarea name="body" rows="2" placeholder="Ajouter une réponse" required></textarea>
+                        <button class="button" type="submit">Ajouter</button>
+                    </form>
+                </div>
+            </article>
+        <% }) %>
+    </section>
+
+    <section class="panel">
+        <h2>Réclamations</h2>
+        <% if (complaints.length === 0) { %>
+            <p>Aucune réclamation pour ce client.</p>
+        <% } %>
+        <% complaints.forEach((complaint) => { %>
+            <article class="item">
+                <div class="item-header">
+                    <div>
+                        <h3><%= complaint.subject %></h3>
+                        <p>Créée le <%= new Date(complaint.created_at).toLocaleDateString('fr-FR') %></p>
+                    </div>
+                    <span class="status"><%= complaint.status %></span>
+                </div>
+                <p><%= complaint.description %></p>
+                <form class="inline-form" method="POST" action="/agent/clients/<%= client.id %>/complaints/<%= complaint.id %>/status">
+                    <select name="status" required>
+                        <option value="pending" <%= complaint.status === 'pending' ? 'selected' : '' %>>En attente</option>
+                        <option value="in_progress" <%= complaint.status === 'in_progress' ? 'selected' : '' %>>En cours</option>
+                        <option value="resolved" <%= complaint.status === 'resolved' ? 'selected' : '' %>>Résolue</option>
+                        <option value="rejected" <%= complaint.status === 'rejected' ? 'selected' : '' %>>Refusée</option>
+                    </select>
+                    <button class="button" type="submit">Mettre à jour</button>
+                </form>
+                <div class="comments">
+                    <h4>Commentaires</h4>
+                    <% complaint.comments.forEach((comment) => { %>
+                        <p><strong><%= comment.first_name %> <%= comment.last_name %></strong> : <%= comment.body %></p>
+                    <% }) %>
+                    <form method="POST" action="/agent/clients/<%= client.id %>/complaints/<%= complaint.id %>/comments">
+                        <textarea name="body" rows="2" placeholder="Ajouter une réponse" required></textarea>
+                        <button class="button" type="submit">Ajouter</button>
+                    </form>
+                </div>
+            </article>
+        <% }) %>
+    </section>
+
+    <section class="panel">
+        <h2>Historique des interactions</h2>
+        <% if (interactions.length === 0) { %>
+            <p>Aucune interaction enregistrée.</p>
+        <% } else { %>
+            <ul class="history">
+            <% interactions.forEach((interaction) => { %>
+                <li><strong><%= client.first_name %> <%= client.last_name %></strong> · <%= interaction.summary %> · <%= new Date(interaction.occurred_at).toLocaleString('fr-FR') %></li>
+            <% }) %>
+            </ul>
+        <% } %>
+    </section>
+</main>
+</body>
+</html>

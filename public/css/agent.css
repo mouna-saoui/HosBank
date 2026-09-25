@@ -1,0 +1,181 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f4f7f8;
+    color: #1f2933;
+    font-family: Arial, sans-serif;
+}
+
+.agent-page {
+    width: min(1180px, 94%);
+    margin: 0 auto;
+    padding: 32px 0 56px;
+}
+
+.agent-header,
+.item-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.agent-header {
+    margin-bottom: 24px;
+}
+
+.agent-header h1,
+.panel h2,
+.item h3,
+.item h4 {
+    margin-top: 0;
+}
+
+.agent-header h1 {
+    margin-bottom: 8px;
+}
+
+.eyebrow {
+    margin: 0 0 6px;
+    color: #087f8c;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.back-link {
+    display: block;
+    margin-bottom: 12px;
+    color: #087f8c;
+}
+
+.panel {
+    margin-bottom: 24px;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #d9e2e5;
+    border-radius: 6px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e7edef;
+    text-align: left;
+    white-space: nowrap;
+}
+
+th {
+    color: #52616b;
+    font-size: 0.9rem;
+}
+
+.button {
+    display: inline-block;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 4px;
+    background: #087f8c;
+    color: #ffffff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button.secondary {
+    background: #52616b;
+}
+
+.status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #e7edef;
+    font-size: 0.9rem;
+}
+
+.alert.error {
+    padding: 12px;
+    background: #ffe9e6;
+    color: #a33a2b;
+}
+
+.item {
+    padding: 18px 0;
+    border-top: 1px solid #e7edef;
+}
+
+.item:first-of-type {
+    border-top: 0;
+}
+
+.item-header p,
+.item > p {
+    color: #52616b;
+}
+
+.inline-form,
+.comments form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+select,
+input,
+textarea {
+    padding: 9px;
+    border: 1px solid #b9c7cc;
+    border-radius: 4px;
+    font: inherit;
+}
+
+input {
+    min-width: 240px;
+    flex: 1;
+}
+
+textarea {
+    width: 100%;
+}
+
+.comments {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f4f7f8;
+}
+
+.comments h4 {
+    margin-bottom: 8px;
+}
+
+.history {
+    padding-left: 20px;
+}
+
+.history li {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 680px) {
+    .agent-header,
+    .item-header {
+        flex-direction: column;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+}
