@@ -1,65 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détail Carte - HosBank</title>
-    <link rel="stylesheet" href="/css/Style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail carte — HosBank</title>
+  <link rel="stylesheet" href="/css/Style.css">
 </head>
 <body>
-<div class="container">
-    <div class="page-header">
+<div class="layout">
+  <%- include('../layouts/sidebar', { userRole: 1, activePage: 'cards' }) %>
+  <div class="main-content">
+    <%- include('../layouts/topbar', { pageTitle: card.card_type === 'virtual' ? 'Carte Virtuelle' : 'Carte Physique', userName: '' }) %>
+    <main class="page-body">
+
+      <div class="page-header">
         <a href="/cards" class="btn-link">← Mes cartes</a>
-        <h1><%= card.card_type === 'virtual' ? 'Carte Virtuelle' : 'Carte Physique' %></h1>
-    </div>
+      </div>
 
-    <% if (error) { %>
-        <div class="alert alert-error"><%= error %></div>
-    <% } %>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
 
-    <div class="detail-card">
+      <div class="detail-card" style="margin-bottom:20px;">
         <div class="detail-row">
-            <span class="label">Numéro</span>
-            <span class="value">**** **** **** <%= card.last_four || '----' %></span>
+          <span class="label">Numéro</span>
+          <span class="value" style="font-family:monospace;">**** **** **** <%= card.last_four || '----' %></span>
         </div>
         <div class="detail-row">
-            <span class="label">Type</span>
-            <span class="value"><%= card.card_type === 'virtual' ? 'Virtuelle' : 'Physique' %></span>
+          <span class="label">Type</span>
+          <span class="value"><%= card.card_type === 'virtual' ? 'Virtuelle' : 'Physique' %></span>
         </div>
         <div class="detail-row">
-            <span class="label">Compte lié</span>
-            <span class="value"><%= card.account_number || '-' %></span>
+          <span class="label">Compte lié</span>
+          <span class="value" style="font-family:monospace;"><%= card.account_number || '—' %></span>
         </div>
         <% if (card.expiry_month && card.expiry_year) { %>
         <div class="detail-row">
-            <span class="label">Expiration</span>
-            <span class="value"><%= String(card.expiry_month).padStart(2,'0') %>/<%= card.expiry_year %></span>
+          <span class="label">Expiration</span>
+          <span class="value"><%= String(card.expiry_month).padStart(2,'0') %>/<%= card.expiry_year %></span>
         </div>
         <% } %>
         <div class="detail-row">
-            <span class="label">Statut</span>
-            <span class="badge badge-<%= card.status %>"><%= card.status %></span>
+          <span class="label">Statut</span>
+          <span class="badge badge-<%= card.status %>"><%= card.status %></span>
         </div>
         <div class="detail-row">
-            <span class="label">Créée le</span>
-            <span class="value"><%= new Date(card.created_at).toLocaleDateString('fr-FR') %></span>
+          <span class="label">Créée le</span>
+          <span class="value"><%= new Date(card.created_at).toLocaleDateString('fr-FR') %></span>
         </div>
-    </div>
+      </div>
 
-    <div class="actions-row">
-        <% if (card.status === 'active') { %>
+      <% if (card.status === 'active') { %>
+      <div class="actions-row">
         <form method="POST" action="/cards/<%= card.id %>/block"
               onsubmit="return confirm('Confirmer l\'opposition sur cette carte ?')">
-            <button type="submit" class="btn-danger">Faire opposition</button>
+          <button type="submit" class="btn btn-danger">Faire opposition</button>
         </form>
         <form method="POST" action="/cards/<%= card.id %>/renew">
-            <button type="submit" class="btn-secondary">Renouveler / Recalculer PIN</button>
+          <button type="submit" class="btn btn-outline">🔄 Renouveler / Recalculer PIN</button>
         </form>
-        <% } %>
-        <% if (card.status === 'blocked') { %>
-            <p class="alert alert-error">Cette carte est bloquée (opposition en cours).</p>
-        <% } %>
-    </div>
+      </div>
+      <% } %>
+
+      <% if (card.status === 'blocked') { %>
+        <div class="alert alert-error"> Cette carte est bloquée — opposition en cours.</div>
+      <% } %>
+
+    </main>
+  </div>
 </div>
 </body>
 </html>
