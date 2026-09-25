@@ -2,18 +2,23 @@ function requireAuth(req, res, next) {
     if (!req.session || !req.session.userId) {
         return res.redirect("/login");
     }
-
     next();
 }
 
-function requireRole(roleId) {
-    return function (req, res, next) {
-        if (!req.session || req.session.roleId !== roleId) {
-            return res.status(403).send("Access denied");
-        }
+function requireApiAuth(req, res, next) {
+    if (!req.session || !req.session.userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    next();
+}
 
+function requireRole(...roleIds) {
+    return function (req, res, next) {
+        if (!req.session || !roleIds.includes(req.session.roleId)) {
+            return res.status(403).send("Accès refusé");
+        }
         next();
     };
 }
 
-module.exports = { requireAuth, requireRole };
+module.exports = { requireAuth, requireApiAuth, requireRole };
