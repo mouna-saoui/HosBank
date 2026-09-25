@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traiter la demande - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <a href="/officer/requests/<%= request.request_type %>" class="btn-link">← Retour</a>
+        <h1>Demande #<%= request.id %></h1>
+    </div>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <div class="detail-card">
+        <div class="detail-row">
+            <span class="label">Client</span>
+            <span class="value"><%= request.first_name %> <%= request.last_name %> (<%= request.email %>)</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Type</span>
+            <span class="value"><%= request.request_type %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Statut actuel</span>
+            <span class="badge badge-<%= request.status %>"><%= request.status %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Détails</span>
+            <span class="value"><%= JSON.stringify(request.details) %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Note de résolution</span>
+            <span class="value"><%= request.resolution_note || '-' %></span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Date</span>
+            <span class="value"><%= new Date(request.created_at).toLocaleDateString('fr-FR') %></span>
+        </div>
+    </div>
+
+    <form method="POST" action="/officer/requests/<%= request.request_type %>/<%= request.id %>/process">
+        <input type="hidden" name="request_type" value="<%= request.request_type %>">
+        <div class="form-group">
+            <label for="status">Nouveau statut</label>
+            <select id="status" name="status" required>
+                <option value="in_review">En cours d'examen</option>
+                <option value="approved">Approuvé</option>
+                <option value="rejected">Rejeté</option>
+                <option value="completed">Complété</option>
+                <option value="cancelled">Annulé</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="resolution_note">Note (optionnelle)</label>
+            <textarea id="resolution_note" name="resolution_note" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Valider</button>
+    </form>
+</div>
+</body>
+</html>
