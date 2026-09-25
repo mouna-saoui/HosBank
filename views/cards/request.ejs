@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demander une carte virtuelle - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="auth-container">
+    <a href="/cards" class="btn-link">← Retour</a>
+    <h2>Demander une carte virtuelle</h2>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <form method="POST" action="/cards">
+        <div class="form-group">
+            <label for="account_id">Compte à associer</label>
+            <select id="account_id" name="account_id" required>
+                <option value="">-- Choisir un compte --</option>
+                <% accounts.filter(a => a.status === 'active').forEach(a => { %>
+                    <option value="<%= a.id %>">
+                        <%= a.account_number %> — <%= a.account_type === 'current' ? 'Courant' : 'Épargne' %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+        <button type="submit" class="btn-primary">Créer la carte virtuelle</button>
+    </form>
+</div>
+</body>
+</html>

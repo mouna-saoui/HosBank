@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande RIB - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <a href="/client/dashboard" class="btn-link">← Tableau de bord</a>
+        <h1>Demande de RIB</h1>
+    </div>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <div class="card">
+        <form method="POST" action="/requests/rib">
+            <div class="form-group">
+                <label for="account_id">Sélectionner un compte</label>
+                <select id="account_id" name="account_id" required>
+                    <option value="">-- Choisir un compte --</option>
+                    <% accounts.filter(a => a.status === 'active').forEach(a => { %>
+                        <option value="<%= a.id %>">
+                            <%= a.account_number %> — <%= a.account_type === 'current' ? 'Courant' : 'Épargne' %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Demander le RIB</button>
+        </form>
+    </div>
+
+    <h2>Mes demandes RIB</h2>
+    <% if (requests.length === 0) { %>
+        <p class="empty-text">Aucune demande RIB pour le moment.</p>
+    <% } else { %>
+    <table class="table">
+        <thead>
+            <tr><th>Date</th><th>Compte</th><th>Statut</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <% requests.forEach(r => { %>
+            <tr>
+                <td><%= new Date(r.created_at).toLocaleDateString('fr-FR') %></td>
+                <td><%= r.details?.account_number || '-' %></td>
+                <td><span class="badge badge-<%= r.status %>"><%= r.status %></span></td>
+                <td>
+                    <% if (r.status === 'completed') { %>
+                        <a href="/requests/rib/<%= r.id %>/info" class="btn-secondary">Voir RIB</a>
+                    <% } else { %>
+                        <span class="text-muted">En attente</span>
+                    <% } %>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% } %>
+</div>
+</body>
+</html>
