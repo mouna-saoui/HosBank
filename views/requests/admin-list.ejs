@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demandes <%= type %> - HosBank</title>
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>Demandes : <%= type === 'rib' ? 'RIB' : type === 'savings_account' ? 'Compte Épargne' : type %></h1>
+        <div class="header-actions">
+            <a href="/officer/requests/rib" class="btn-secondary">RIB</a>
+            <a href="/officer/requests/savings_account" class="btn-secondary">Épargne</a>
+            <a href="/officer/cards" class="btn-secondary">Cartes</a>
+            <a href="/logout" class="btn-link">Déconnexion</a>
+        </div>
+    </div>
+
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <% if (requests.length === 0) { %>
+        <p class="empty-text">Aucune demande.</p>
+    <% } else { %>
+    <table class="table">
+        <thead>
+            <tr><th>ID</th><th>Client</th><th>Date</th><th>Statut</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <% requests.forEach(r => { %>
+            <tr>
+                <td>#<%= r.id %></td>
+                <td><%= r.first_name %> <%= r.last_name %></td>
+                <td><%= new Date(r.created_at).toLocaleDateString('fr-FR') %></td>
+                <td><span class="badge badge-<%= r.status %>"><%= r.status %></span></td>
+                <td><a href="/officer/requests/<%= type %>/<%= r.id %>" class="btn-secondary">Traiter</a></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+    <% } %>
+</div>
+</body>
+</html>

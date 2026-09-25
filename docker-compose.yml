@@ -21,7 +21,6 @@ services:
     command: sh -c "npm run db:setup && npm start"
 
 
-
   postgres:
     image: postgres:17-alpine
     container_name: hosbank-db
@@ -49,3 +48,4 @@ services:
       - "5555:80"
     depends_on:
       - postgres
+

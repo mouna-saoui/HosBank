@@ -39,13 +39,25 @@ CREATE TABLE IF NOT EXISTS beneficiaries (
 	id BIGSERIAL PRIMARY KEY,
 	user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	name VARCHAR(150) NOT NULL,
+	rib VARCHAR(50) NOT NULL,
+	bank_name VARCHAR(150) NOT NULL,
 	account_number VARCHAR(34),
 	iban VARCHAR(34),
-	bank_name VARCHAR(150),
 	status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'blocked')),
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	CONSTRAINT beneficiary_account_identifier CHECK (account_number IS NOT NULL OR iban IS NOT NULL)
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	CONSTRAINT beneficiary_account_identifier CHECK (account_number IS NOT NULL OR iban IS NOT NULL OR rib IS NOT NULL)
 );
+
+ALTER TABLE beneficiaries ADD COLUMN IF NOT EXISTS rib VARCHAR(50);
+ALTER TABLE beneficiaries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+ALTER TABLE beneficiaries DROP CONSTRAINT IF EXISTS beneficiary_account_identifier;
+ALTER TABLE beneficiaries
+	ADD CONSTRAINT beneficiary_account_identifier
+	CHECK (account_number IS NOT NULL OR iban IS NOT NULL OR rib IS NOT NULL);
+UPDATE beneficiaries
+SET rib = COALESCE(rib, account_number, iban)
+WHERE rib IS NULL;
 
 CREATE TABLE IF NOT EXISTS transfers (
 	id BIGSERIAL PRIMARY KEY,
@@ -156,6 +168,7 @@ CREATE TABLE IF NOT EXISTS email_verifications (
 CREATE UNIQUE INDEX IF NOT EXISTS one_active_assignment_per_client
 	ON client_assignments (client_id) WHERE unassigned_at IS NULL;
 CREATE INDEX IF NOT EXISTS accounts_user_id_idx ON accounts (user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS beneficiaries_user_rib_idx ON beneficiaries (user_id, rib);
 CREATE INDEX IF NOT EXISTS transfers_sender_account_id_idx ON transfers (sender_account_id);
 CREATE INDEX IF NOT EXISTS transactions_account_id_created_at_idx ON transactions (account_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS bank_requests_user_id_status_idx ON bank_requests (user_id, status);

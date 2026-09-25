@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard client - HosBank</title>
+</head>
+<body>
+    <main>
+        <h1>Bonjour <%= client.first_name %> <%= client.last_name %></h1>
+        <p>Solde total : <strong><%= balances.total %> <%= balances.currency %></strong></p>
+
+        <h2>Mes comptes</h2>
+        <ul>
+            <% accounts.forEach((account) => { %>
+                <li><%= account.account_number %> - <%= account.balance %> <%= account.currency %></li>
+            <% }) %>
+        </ul>
+
+        <h2>Dernières opérations</h2>
+        <ul>
+            <% recentTransactions.forEach((transaction) => { %>
+                <li><%= transaction.transaction_type %> : <%= transaction.amount %> <%= balances.currency %></li>
+            <% }) %>
+        </ul>
+
+        <h2>Demandes en cours</h2>
+        <ul>
+            <% pendingRequests.forEach((request) => { %>
+                <li><%= request.request_type %> - <%= request.status %></li>
+            <% }) %>
+        </ul>
+    </main>
+</body>
+</html>
