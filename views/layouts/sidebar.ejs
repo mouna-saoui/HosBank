@@ -1,0 +1,46 @@
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">HosBank</div>
+    <div class="brand-sub">Votre espace bancaire</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <% if (typeof userRole !== 'undefined' && userRole === 1) { %>
+      <div class="nav-section-label">Mon espace</div>
+      <a href="/client/dashboard" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'dashboard' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Tableau de bord
+      </a>
+      <a href="/accounts" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'accounts' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Mes comptes
+      </a>
+      <a href="/cards" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'cards' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Mes cartes
+      </a>
+      <div class="nav-section-label">Demandes</div>
+      <a href="/requests/rib" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'rib' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Demande RIB
+      </a>
+      <a href="/requests/savings" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'savings' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Compte épargne
+      </a>
+    <% } else { %>
+      <div class="nav-section-label">Espace agent</div>
+      <a href="/officer/requests/rib" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'req-rib' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Demandes RIB
+      </a>
+      <a href="/officer/requests/savings_account" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'req-savings' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Demandes Épargne
+      </a>
+      <a href="/officer/cards" class="nav-item <%= typeof activePage !== 'undefined' && activePage === 'officer-cards' ? 'active' : '' %>">
+        <span class="nav-icon"></span> Gestion cartes
+      </a>
+    <% } %>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="/logout" class="nav-item">
+      <span class="nav-icon">↩</span> Déconnexion
+    </a>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

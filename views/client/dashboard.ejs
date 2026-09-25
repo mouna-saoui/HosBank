@@ -1,35 +1,106 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard client - HosBank</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord — HosBank</title>
+  <link rel="stylesheet" href="/css/Style.css">
 </head>
 <body>
-    <main>
-        <h1>Bonjour <%= client.first_name %> <%= client.last_name %></h1>
-        <p>Solde total : <strong><%= balances.total %> <%= balances.currency %></strong></p>
+<div class="layout">
+  <%- include('../layouts/sidebar', { userRole: 1, activePage: 'dashboard' }) %>
+  <div class="main-content">
+    <%- include('../layouts/topbar', { pageTitle: 'Tableau de bord', userName: client.first_name + ' ' + client.last_name }) %>
+    <main class="page-body">
 
-        <h2>Mes comptes</h2>
-        <ul>
-            <% accounts.forEach((account) => { %>
-                <li><%= account.account_number %> - <%= account.balance %> <%= account.currency %></li>
-            <% }) %>
-        </ul>
+      <div class="card-hero" style="margin-bottom:24px;">
+        <div class="hero-label">Bonjour <%= client.first_name %>  — Solde total</div>
+        <div class="hero-amount"><%= parseFloat(balances.total).toLocaleString('fr-FR', {minimumFractionDigits:2}) %> <%= balances.currency %></div>
+        <div class="hero-sub"><%= accounts.length %> compte<%= accounts.length > 1 ? 's' : '' %> enregistré<%= accounts.length > 1 ? 's' : '' %></div>
+      </div>
 
-        <h2>Dernières opérations</h2>
-        <ul>
-            <% recentTransactions.forEach((transaction) => { %>
-                <li><%= transaction.transaction_type %> : <%= transaction.amount %> <%= balances.currency %></li>
-            <% }) %>
-        </ul>
+      <div class="section-title">Actions rapides</div>
+      <div class="quick-actions" style="margin-bottom:28px;">
+        <a href="/accounts" class="quick-action"><span class="qa-icon"></span>Comptes</a>
+        <a href="/requests/rib" class="quick-action"><span class="qa-icon"></span>RIB</a>
+        <a href="/cards" class="quick-action"><span class="qa-icon"></span>Cartes</a>
+        <a href="/requests/savings" class="quick-action"><span class="qa-icon"></span>Épargne</a>
+      </div>
 
-        <h2>Demandes en cours</h2>
-        <ul>
-            <% pendingRequests.forEach((request) => { %>
-                <li><%= request.request_type %> - <%= request.status %></li>
-            <% }) %>
-        </ul>
+      <div class="dashboard-grid">
+
+        <div>
+          <div class="section-title">
+            Mes comptes
+            <a href="/accounts" class="btn-link" style="font-size:0.8rem;">Voir tout →</a>
+          </div>
+          <% if (accounts.length === 0) { %>
+            <div class="card empty-state">
+              <div class="empty-icon"></div>
+              <p>Aucun compte pour le moment.</p>
+              <a href="/accounts/new" class="btn btn-primary btn-sm">Ouvrir un compte</a>
+            </div>
+          <% } else { %>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <% accounts.forEach(account => { %>
+              <div class="account-card status-<%= account.status %>">
+                <div class="account-card-header">
+                  <span class="account-type"><%= account.accountType === 'current' ? 'Compte Courant' : 'Compte Épargne' %></span>
+                  <span class="badge badge-<%= account.status %>"><%= account.status === 'active' ? 'Actif' : account.status === 'blocked' ? 'Bloqué' : 'Clôturé' %></span>
+                </div>
+                <div class="account-number"><%= account.account_number %></div>
+                <div class="account-balance"><%= parseFloat(account.balance).toLocaleString('fr-FR', {minimumFractionDigits:2}) %> <%= account.currency %></div>
+              </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+
+        <div>
+          <div class="section-title">Demandes en cours</div>
+          <% if (pendingRequests.length === 0) { %>
+            <div class="card"><p class="empty-text">Aucune demande en cours.</p></div>
+          <% } else { %>
+            <div class="table-wrapper">
+              <% pendingRequests.forEach(r => { %>
+              <div class="detail-row">
+                <span class="label"><%= r.request_type === 'rib' ? 'Demande RIB' : r.request_type === 'savings_account' ? 'Compte Épargne' : r.request_type %></span>
+                <span class="badge badge-<%= r.status %>"><%= r.status === 'pending' ? 'En attente' : r.status === 'in_review' ? 'En examen' : r.status %></span>
+              </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="span-2">
+          <div class="section-title">Dernières opérations</div>
+          <% if (recentTransactions.length === 0) { %>
+            <div class="card"><p class="empty-text">Aucune opération pour le moment.</p></div>
+          <% } else { %>
+            <div class="table-wrapper">
+              <div class="table-scroll">
+                <table class="table">
+                  <thead><tr><th>Type</th><th>Montant</th><th>Date</th></tr></thead>
+                  <tbody>
+                    <% recentTransactions.forEach(tx => { %>
+                    <tr>
+                      <td><%= tx.transaction_type %></td>
+                      <td class="<%= tx.amount > 0 ? 'amount-positive' : 'amount-negative' %>">
+                        <%= parseFloat(tx.amount).toLocaleString('fr-FR', {minimumFractionDigits:2}) %> <%= balances.currency %>
+                      </td>
+                      <td style="color:var(--text-muted);font-size:0.82rem;"><%= tx.created_at ? new Date(tx.created_at).toLocaleDateString('fr-FR') : '-' %></td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% } %>
+        </div>
+
+      </div>
     </main>
+  </div>
+</div>
 </body>
 </html>

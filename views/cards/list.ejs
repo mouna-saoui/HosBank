@@ -1,46 +1,52 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Cartes - HosBank</title>
-    <link rel="stylesheet" href="/css/Style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes cartes — HosBank</title>
+  <link rel="stylesheet" href="/css/Style.css">
 </head>
 <body>
-<div class="container">
-    <div class="page-header">
-        <a href="/client/dashboard" class="btn-link">← Tableau de bord</a>
-        <h1>Mes Cartes</h1>
-        <a href="/cards/new" class="btn-primary">+ Carte virtuelle</a>
-    </div>
+<div class="layout">
+  <%- include('../layouts/sidebar', { userRole: 1, activePage: 'cards' }) %>
+  <div class="main-content">
+    <%- include('../layouts/topbar', { pageTitle: 'Mes cartes', userName: '' }) %>
+    <main class="page-body">
 
-    <% if (error) { %>
-        <div class="alert alert-error"><%= error %></div>
-    <% } %>
+      <div class="page-header">
+        <h1>Mes cartes</h1>
+        <a href="/cards/new" class="btn btn-primary">+ Carte virtuelle</a>
+      </div>
 
-    <% if (cards.length === 0) { %>
-        <div class="empty-state">
-            <p>Vous n'avez aucune carte bancaire.</p>
-            <a href="/cards/new" class="btn-primary">Demander une carte virtuelle</a>
+      <% if (error) { %><div class="alert alert-error"> <%= error %></div><% } %>
+
+      <% if (cards.length === 0) { %>
+        <div class="card empty-state">
+          <div class="empty-icon">🪪</div>
+          <p>Vous n'avez aucune carte bancaire pour le moment.</p>
+          <a href="/cards/new" class="btn btn-primary">Demander une carte virtuelle</a>
         </div>
-    <% } else { %>
-    <div class="accounts-grid">
-        <% cards.forEach(card => { %>
-        <div class="account-card status-<%= card.status %>">
+      <% } else { %>
+        <div class="accounts-grid">
+          <% cards.forEach(card => { %>
+          <div class="account-card status-<%= card.status %>">
             <div class="account-card-header">
-                <span class="account-type"><%= card.card_type === 'virtual' ? 'Carte Virtuelle' : 'Carte Physique' %></span>
-                <span class="badge badge-<%= card.status %>"><%= card.status %></span>
+              <span class="account-type"><%= card.card_type === 'virtual' ? 'Carte Virtuelle' : 'Carte Physique' %></span>
+              <span class="badge badge-<%= card.status %>"><%= card.status %></span>
             </div>
             <div class="account-number">**** **** **** <%= card.last_four || '----' %></div>
-            <div class="account-rib">Compte : <%= card.account_number || '-' %></div>
+            <div class="account-rib">Compte : <%= card.account_number || '—' %></div>
             <% if (card.expiry_month && card.expiry_year) { %>
-                <div class="account-rib">Expire : <%= String(card.expiry_month).padStart(2,'0') %>/<%= card.expiry_year %></div>
+              <div class="account-rib">Expire : <%= String(card.expiry_month).padStart(2,'0') %>/<%= card.expiry_year %></div>
             <% } %>
-            <a href="/cards/<%= card.id %>" class="btn-secondary">Détail</a>
+            <a href="/cards/<%= card.id %>" class="btn btn-outline btn-sm">Voir le détail →</a>
+          </div>
+          <% }) %>
         </div>
-        <% }) %>
-    </div>
-    <% } %>
+      <% } %>
+
+    </main>
+  </div>
 </div>
 </body>
 </html>
