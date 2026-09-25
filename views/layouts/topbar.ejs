@@ -1,0 +1,31 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+    <span class="topbar-title"><%= typeof pageTitle !== 'undefined' ? pageTitle : '' %></span>
+  </div>
+  <div class="topbar-right">
+    <% if (typeof userName !== 'undefined' && userName) { %>
+    <div class="topbar-user">
+      <div class="topbar-avatar"><%= userName.charAt(0).toUpperCase() %></div>
+      <span><%= userName %></span>
+    </div>
+    <% } %>
+  </div>
+</header>
+
+<script>
+  (function() {
+    var toggle = document.getElementById('menuToggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (!toggle) return;
+    toggle.addEventListener('click', function() {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    });
+    overlay.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    });
+  })();
+</script>
