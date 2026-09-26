@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Cartes — HosBank</title><link rel="stylesheet" href="/css/Style.css"></head>
+<body><div class="layout"><%- include('../layouts/sidebar', { userRole, activePage }) %><div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Cartes', userName }) %><main class="page-body">
+  <div class="page-header"><div><h1>Cartes bancaires</h1><p class="text-muted">Consultation et statut des cartes</p></div></div>
+  <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <div class="table-wrapper"><div class="table-scroll"><table class="table">
+    <thead><tr><th>Propriétaire</th><th>Compte</th><th>Type</th><th>Numéro</th><th>Expiration</th><th>Statut</th><th></th></tr></thead>
+    <tbody><% cards.forEach(card => { %><tr>
+      <td><%= card.first_name %> <%= card.last_name %><br><span class="text-muted"><%= card.email %></span></td><td><%= card.account_number || '-' %></td><td><%= card.card_type %></td>
+      <td><%= card.last_four ? '•••• ' + card.last_four : '-' %></td><td><%= card.expiry_month || '-' %>/<%= card.expiry_year || '-' %></td>
+      <td><span class="badge badge-<%= card.status %>"><%= card.status %></span></td>
+      <td><form method="POST" action="/admin/cards/<%= card.id %>/status"><select name="status" onchange="this.form.submit()"><% ['active','blocked','expired','cancelled'].forEach(status => { %><option value="<%= status %>" <%= status === card.status ? 'selected' : '' %>><%= status %></option><% }) %></select></form></td>
+    </tr><% }) %></tbody>
+  </table></div></div>
+</main></div></div></body></html>

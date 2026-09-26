@@ -7,26 +7,29 @@ async function getDashboard(userId) {
 		return null;
 	}
 
-	const [accounts, recentTransactions, pendingRequests] = await Promise.all([
-		clientModel.findAccountsByClientId(userId),
-		clientModel.findRecentTransactionsByClientId(userId),
-		clientModel.findPendingRequestsByClientId(userId),
-	]);
+	const accounts = await clientModel.findAccountsByClientId(userId);
+	const recentTransactions = await clientModel.findRecentTransactionsByClientId(userId);
+	const pendingRequests = await clientModel.findPendingRequestsByClientId(userId);
 
-	const totalBalance = accounts.reduce(
-		(total, account) => total + Number(account.balance),
-		0
-	);
+	let totalBalance = 0;
+	for (let i = 0; i < accounts.length; i++) {
+		totalBalance += Number(accounts[i].balance);
+	}
+
+	let defaultCurrency = "MAD";
+	if (accounts.length > 0 && accounts[0].currency) {
+		defaultCurrency = accounts[0].currency;
+	}
 
 	return {
-		client,
-		accounts,
+		client: client,
+		accounts: accounts,
 		balances: {
 			total: totalBalance.toFixed(2),
-			currency: accounts[0]?.currency || "MAD",
+			currency: defaultCurrency,
 		},
-		recentTransactions,
-		pendingRequests,
+		recentTransactions: recentTransactions,
+		pendingRequests: pendingRequests,
 	};
 }
 

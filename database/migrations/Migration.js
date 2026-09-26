@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS transfers (
 	recipient_name VARCHAR(150) NOT NULL,
 	recipient_account_number VARCHAR(34),
 	recipient_iban VARCHAR(34),
+	recipient_rib VARCHAR(50),
 	amount NUMERIC(15, 2) NOT NULL CHECK (amount > 0),
 	currency CHAR(3) NOT NULL DEFAULT 'MAD',
 	status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled')),
@@ -73,8 +74,14 @@ CREATE TABLE IF NOT EXISTS transfers (
 	failure_reason TEXT,
 	executed_at TIMESTAMPTZ,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	CONSTRAINT transfer_recipient_identifier CHECK (recipient_account_number IS NOT NULL OR recipient_iban IS NOT NULL)
+	CONSTRAINT transfer_recipient_identifier CHECK (recipient_account_number IS NOT NULL OR recipient_iban IS NOT NULL OR recipient_rib IS NOT NULL)
 );
+
+ALTER TABLE transfers ADD COLUMN IF NOT EXISTS recipient_rib VARCHAR(50);
+ALTER TABLE transfers DROP CONSTRAINT IF EXISTS transfer_recipient_identifier;
+ALTER TABLE transfers
+	ADD CONSTRAINT transfer_recipient_identifier
+	CHECK (recipient_account_number IS NOT NULL OR recipient_iban IS NOT NULL OR recipient_rib IS NOT NULL);
 
 CREATE TABLE IF NOT EXISTS transactions (
 	id BIGSERIAL PRIMARY KEY,
@@ -139,11 +146,94 @@ CREATE TABLE IF NOT EXISTS request_comments (
 CREATE TABLE IF NOT EXISTS client_assignments (
 	id BIGSERIAL PRIMARY KEY,
 	client_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-	officer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-	assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	unassigned_at TIMESTAMPTZ,
-	CONSTRAINT assignment_dates CHECK (unassigned_at IS NULL OR unassigned_at >= assigned_at)
+	agent_id BIGINT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+	assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT client_assignments_client_agent_unique UNIQUE (client_id, agent_id)
 );
+
+DO $$
+BEGIN
+	IF EXISTS (
+		SELECT 1
+		FROM information_schema.columns
+		WHERE table_name = 'client_assignments' AND column_name = 'officer_id'
+	) AND NOT EXISTS (
+		SELECT 1
+		FROM information_schema.columns
+		WHERE table_name = 'client_assignments' AND column_name = 'agent_id'
+	) THEN
+		ALTER TABLE client_assignments RENAME COLUMN officer_id TO agent_id;
+	END IF;
+END $$;
+
+ALTER TABLE client_assignments DROP CONSTRAINT IF EXISTS assignment_dates;
+ALTER TABLE client_assignments DROP COLUMN IF EXISTS unassigned_at;
+DROP INDEX IF EXISTS one_active_assignment_per_client;
+
+DO $$
+BEGIN
+	IF EXISTS (
+		SELECT 1
+		FROM pg_constraint
+		WHERE conname = 'client_assignments_officer_id_fkey'
+	) THEN
+		ALTER TABLE client_assignments
+			RENAME CONSTRAINT client_assignments_officer_id_fkey TO client_assignments_agent_id_fkey;
+	END IF;
+END $$;
+
+ALTER TABLE client_assignments
+	ALTER COLUMN assigned_at TYPE TIMESTAMP USING assigned_at::timestamp,
+	ALTER COLUMN assigned_at SET DEFAULT CURRENT_TIMESTAMP,
+	ALTER COLUMN assigned_at SET NOT NULL;
+
+DO $$
+BEGIN
+	IF NOT EXISTS (
+		SELECT 1
+		FROM pg_constraint
+		WHERE conname = 'client_assignments_client_agent_unique'
+	) THEN
+		ALTER TABLE client_assignments
+			ADD CONSTRAINT client_assignments_client_agent_unique UNIQUE (client_id, agent_id);
+	END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS client_assignments_client_id_idx
+	ON client_assignments (client_id);
+CREATE INDEX IF NOT EXISTS client_assignments_agent_id_idx
+	ON client_assignments (agent_id);
+
+CREATE OR REPLACE FUNCTION validate_client_assignment_users()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NOT EXISTS (
+		SELECT 1
+		FROM users
+		JOIN roles ON roles.id = users.role_id
+		WHERE users.id = NEW.client_id AND roles.name = 'Client'
+	) THEN
+		RAISE EXCEPTION 'client_id must refer to a user with the Client role';
+	END IF;
+
+	IF NOT EXISTS (
+		SELECT 1
+		FROM users
+		JOIN roles ON roles.id = users.role_id
+		WHERE users.id = NEW.agent_id AND roles.name = 'Chargé Client'
+	) THEN
+		RAISE EXCEPTION 'agent_id must refer to a user with the Chargé Client role';
+	END IF;
+
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS validate_client_assignment_users_trigger ON client_assignments;
+CREATE TRIGGER validate_client_assignment_users_trigger
+	BEFORE INSERT OR UPDATE OF client_id, agent_id ON client_assignments
+	FOR EACH ROW
+	EXECUTE FUNCTION validate_client_assignment_users();
 
 CREATE TABLE IF NOT EXISTS interactions (
 	id BIGSERIAL PRIMARY KEY,
@@ -165,8 +255,6 @@ CREATE TABLE IF NOT EXISTS email_verifications (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS one_active_assignment_per_client
-	ON client_assignments (client_id) WHERE unassigned_at IS NULL;
 CREATE INDEX IF NOT EXISTS accounts_user_id_idx ON accounts (user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS beneficiaries_user_rib_idx ON beneficiaries (user_id, rib);
 CREATE INDEX IF NOT EXISTS transfers_sender_account_id_idx ON transfers (sender_account_id);

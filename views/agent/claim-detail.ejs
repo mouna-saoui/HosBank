@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail réclamation — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Détail réclamation', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><a class="btn-link" href="/agent/claims">← Réclamations</a><h1><%= claim.subject %></h1></div></div>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <section class="detail-card">
+        <div class="detail-row"><span class="label">Client</span><span class="value"><%= claim.first_name %> <%= claim.last_name %> (<%= claim.email %>)</span></div>
+        <div class="detail-row"><span class="label">Sujet</span><span class="value"><%= claim.subject %></span></div>
+        <div class="detail-row"><span class="label">Description</span><span class="value"><%= claim.description %></span></div>
+        <div class="detail-row"><span class="label">Date</span><span class="value"><%= new Date(claim.created_at).toLocaleDateString('fr-FR') %></span></div>
+        <div class="detail-row"><span class="label">Statut</span><span class="value"><span class="badge badge-<%= claim.status %>"><%= claim.status %></span></span></div>
+      </section>
+      <section class="form-section" style="margin-bottom:24px;max-width:none;">
+        <div class="section-title">Modifier le statut</div>
+        <form method="POST" action="/agent/clients/<%= claim.client_id %>/complaints/<%= claim.id %>/status">
+          <div class="form-group"><label for="status">Nouveau statut</label><select id="status" name="status" required>
+            <option value="pending" <%= claim.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="in_progress" <%= claim.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+            <option value="resolved" <%= claim.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+            <option value="rejected" <%= claim.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+          </select></div>
+          <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </form>
+      </section>
+      <section class="card">
+        <div class="section-title">Commentaires</div>
+        <% if (claim.comments.length === 0) { %><p class="empty-text">Aucun commentaire.</p><% } %>
+        <% claim.comments.forEach(comment => { %><p><strong><%= comment.first_name %> <%= comment.last_name %></strong> · <%= comment.body %></p><% }) %>
+        <form method="POST" action="/agent/clients/<%= claim.client_id %>/complaints/<%= claim.id %>/comments" style="margin-top:16px;">
+          <div class="form-group"><label for="body">Ajouter une réponse</label><textarea id="body" name="body" rows="3" required></textarea></div>
+          <button class="btn btn-primary" type="submit">Ajouter</button>
+        </form>
+      </section>
+    </main>
+  </div>
+</div></body></html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Comptes — HosBank</title><link rel="stylesheet" href="/css/Style.css"></head>
+<body><div class="layout"><%- include('../layouts/sidebar', { userRole, activePage }) %><div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Comptes bancaires', userName }) %><main class="page-body">
+  <div class="page-header"><div><h1>Comptes bancaires</h1><p class="text-muted">Consultation et statut des comptes</p></div></div>
+  <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <div class="table-wrapper"><div class="table-scroll"><table class="table">
+    <thead><tr><th>Propriétaire</th><th>Numéro</th><th>Type</th><th>IBAN</th><th>RIB</th><th>Solde</th><th>Statut</th><th></th></tr></thead>
+    <tbody><% accounts.forEach(account => { %><tr>
+      <td><%= account.first_name %> <%= account.last_name %><br><span class="text-muted"><%= account.email %></span></td><td><%= account.account_number %></td><td><%= account.account_type %></td>
+      <td><%= account.iban || '-' %></td><td><%= account.rib || '-' %></td><td><%= account.balance %> <%= account.currency %></td>
+      <td><span class="badge badge-<%= account.status %>"><%= account.status %></span></td>
+      <td><form method="POST" action="/admin/accounts/<%= account.id %>/status"><select name="status" onchange="this.form.submit()"><% ['active','blocked','closed'].forEach(status => { %><option value="<%= status %>" <%= status === account.status ? 'selected' : '' %>><%= status %></option><% }) %></select></form></td>
+    </tr><% }) %></tbody>
+  </table></div></div>
+</main></div></div></body></html>

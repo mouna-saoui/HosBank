@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail demande — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Détail demande', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><a class="btn-link" href="/agent/requests">← Demandes</a><h1>Demande #<%= request.id %></h1></div></div>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <section class="detail-card">
+        <div class="detail-row"><span class="label">Client</span><span class="value"><%= request.first_name %> <%= request.last_name %> (<%= request.email %>)</span></div>
+        <div class="detail-row"><span class="label">Type</span><span class="value"><%= request.request_type %></span></div>
+        <div class="detail-row"><span class="label">Date</span><span class="value"><%= new Date(request.created_at).toLocaleDateString('fr-FR') %></span></div>
+        <div class="detail-row"><span class="label">Statut</span><span class="value"><span class="badge badge-<%= request.status %>"><%= request.status %></span></span></div>
+        <div class="detail-row"><span class="label">Informations</span><span class="value"><%= JSON.stringify(request.details || {}) %></span></div>
+        <div class="detail-row"><span class="label">Commentaire</span><span class="value"><%= request.resolution_note || '-' %></span></div>
+      </section>
+      <% if (['pending', 'in_progress', 'in_review'].includes(request.status)) { %>
+      <section class="form-section" style="margin-bottom:24px;max-width:none;">
+        <div class="section-title">Modifier le statut</div>
+        <form method="POST" action="/agent/clients/<%= request.client_id %>/requests/<%= request.id %>/status">
+          <div class="form-group"><label for="status">Nouveau statut</label><select id="status" name="status" required>
+            <% if (request.status === 'pending') { %><option value="in_progress">In Progress</option><% } %>
+            <option value="approved">Approved</option><option value="rejected">Rejected</option>
+          </select></div>
+          <div class="form-group"><label for="resolution_note">Commentaire</label><textarea id="resolution_note" name="resolution_note" rows="3"></textarea></div>
+          <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </form>
+      </section>
+      <% } %>
+      <section class="card">
+        <div class="section-title">Commentaires</div>
+        <% if (request.comments.length === 0) { %><p class="empty-text">Aucun commentaire.</p><% } %>
+        <% request.comments.forEach(comment => { %><p><strong><%= comment.first_name %> <%= comment.last_name %></strong> · <%= comment.body %></p><% }) %>
+        <form method="POST" action="/agent/clients/<%= request.client_id %>/requests/<%= request.id %>/comments" style="margin-top:16px;">
+          <div class="form-group"><label for="body">Ajouter un commentaire</label><textarea id="body" name="body" rows="3" required></textarea></div>
+          <button class="btn btn-primary" type="submit">Ajouter</button>
+        </form>
+      </section>
+    </main>
+  </div>
+</div></body></html>
