@@ -6,7 +6,9 @@ const compteController = require("../controllers/CompteController");
 const clientController = require("../controllers/clientController");
 const bankRequestController = require("../controllers/bankRequestController");
 const cardController = require("../controllers/cardController");
+const transferController = require("../controllers/TransferController");
 const agentRoutes = require("./agentRoutes");
+const adminRoutes = require("./adminRoutes");
 
 const { requireAuth, requireRole } = require("../middelewares/Middelware");
 
@@ -22,6 +24,8 @@ router.get("/logout", authController.logout);
 
 // ── Client dashboard ─────────────────────────────────────
 router.get("/client/dashboard", clientOnly, clientController.dashboard);
+router.get("/virements", clientOnly, transferController.showTransfers);
+router.post("/virements", clientOnly, transferController.createTransfer);
 
 // ── US-11 : Comptes bancaires (client) ───────────────────
 router.get("/accounts", clientOnly, compteController.listAccounts);
@@ -58,6 +62,7 @@ router.post("/officer/cards/:id/status", agentOrAdmin, cardController.updateCard
 
 // ── Chargé Client : clients affectés ────────────────────
 router.use(agentRoutes);
+router.use(adminRoutes);
 
 // ── Default ───────────────────────────────────────────────
 router.get("/", (req, res) => res.redirect("/login"));

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Affectations — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Affectations', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><h1>Affecter un client</h1><p class="text-muted">Associer un client à un Chargé Client</p></div></div>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <section class="form-section" style="max-width:none;margin-bottom:24px;">
+        <form method="POST" action="/admin/assignments">
+          <div class="header-actions">
+            <select name="client_id" required><option value="">Choisir un client</option><% clients.forEach(client => { %><option value="<%= client.id %>"><%= client.first_name %> <%= client.last_name %> — <%= client.email %></option><% }) %></select>
+            <select name="agent_id" required><option value="">Choisir un Chargé Client</option><% agents.forEach(agent => { %><option value="<%= agent.id %>"><%= agent.first_name %> <%= agent.last_name %> — <%= agent.email %></option><% }) %></select>
+            <button class="btn btn-primary" type="submit">Affecter</button>
+          </div>
+        </form>
+      </section>
+      <div class="section-title">Affectations actuelles</div>
+      <div class="table-wrapper"><div class="table-scroll"><table class="table">
+        <thead><tr><th>Client</th><th>Chargé Client</th><th>Date</th></tr></thead>
+        <tbody><% assignments.forEach(assignment => { %><tr>
+          <td><%= assignment.client_first_name %> <%= assignment.client_last_name %></td><td><%= assignment.agent_first_name %> <%= assignment.agent_last_name %></td>
+          <td><%= new Date(assignment.assigned_at).toLocaleDateString('fr-FR') %></td>
+        </tr><% }) %></tbody>
+      </table></div></div>
+    </main>
+  </div>
+</div></body></html>
