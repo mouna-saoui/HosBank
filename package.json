@@ -7,8 +7,10 @@
     "test": "node test.js",
     "start": "node server.js",
     "migrate": "node database/migrations/Migration.js",
+    "migrate:client-assignments": "node database/migrations/ClientAssignmentsMigration.js",
+    "migrate:agent-workspace": "node database/migrations/AgentWorkspaceMigration.js",
     "seed": "node database/seeds/Seed.js",
-    "db:setup": "npm run migrate && npm run seed"
+    "db:setup": "npm run migrate && npm run migrate:client-assignments && npm run migrate:agent-workspace && npm run seed"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
     "ejs": "^6.0.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
+    "nodemailer": "^10.0.11",
     "pg": "^8.23.0"
   }
 }

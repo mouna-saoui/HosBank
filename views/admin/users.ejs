@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utilisateurs — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Utilisateurs', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><h1>Gestion des utilisateurs</h1><p class="text-muted">Rechercher, activer et gérer les rôles</p></div></div>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <form class="card" method="GET" action="/admin/users" style="margin-bottom:24px;">
+        <div class="header-actions">
+          <input name="search" value="<%= filters.search %>" placeholder="Nom, prénom ou email">
+          <select name="role_id"><option value="">Tous les rôles</option><% roles.forEach(role => { %><option value="<%= role.id %>" <%= String(filters.roleId) === String(role.id) ? 'selected' : '' %>><%= role.name %></option><% }) %></select>
+          <select name="status"><option value="">Tous les statuts</option><% ['active','inactive','blocked'].forEach(status => { %><option value="<%= status %>" <%= filters.status === status ? 'selected' : '' %>><%= status %></option><% }) %></select>
+          <button class="btn btn-primary" type="submit">Rechercher</button>
+        </div>
+      </form>
+      <div class="table-wrapper"><div class="table-scroll"><table class="table">
+        <thead><tr><th>Utilisateur</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody><% users.forEach(user => { %><tr>
+          <td><%= user.first_name %> <%= user.last_name %><br><span class="text-muted"><%= user.phone || '-' %></span></td><td><%= user.email %></td>
+          <td><form method="POST" action="/admin/users/<%= user.id %>/role"><select name="role_id" onchange="this.form.submit()"><% roles.forEach(role => { %><option value="<%= role.id %>" <%= role.id === user.role_id ? 'selected' : '' %>><%= role.name %></option><% }) %></select></form></td>
+          <td><span class="badge badge-<%= user.status %>"><%= user.status %></span></td>
+          <td><form method="POST" action="/admin/users/<%= user.id %>/status"><input type="hidden" name="status" value="<%= user.status === 'active' ? 'inactive' : 'active' %>"><button class="btn btn-outline btn-sm" type="submit"><%= user.status === 'active' ? 'Désactiver' : 'Activer' %></button></form></td>
+        </tr><% }) %></tbody>
+      </table></div></div>
+    </main>
+  </div>
+</div></body></html>

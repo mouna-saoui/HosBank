@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Détail client', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><a class="btn-link" href="/agent/clients">← Mes clients</a><h1><%= client.first_name %> <%= client.last_name %></h1></div></div>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <section class="detail-card">
+        <div class="detail-row"><span class="label">Prénom</span><span class="value"><%= client.first_name %></span></div>
+        <div class="detail-row"><span class="label">Nom</span><span class="value"><%= client.last_name %></span></div>
+        <div class="detail-row"><span class="label">Email</span><span class="value"><%= client.email %></span></div>
+        <div class="detail-row"><span class="label">Téléphone</span><span class="value"><%= client.phone || '-' %></span></div>
+        <div class="detail-row"><span class="label">Statut</span><span class="value"><span class="badge badge-<%= client.status %>"><%= client.status %></span></span></div>
+      </section>
+
+      <div class="section-title">Comptes bancaires</div>
+      <% if (accounts.length === 0) { %><div class="card empty-state"><p>Aucun compte bancaire.</p></div><% } else { %>
+      <div class="table-wrapper" style="margin-bottom:24px;"><div class="table-scroll"><table class="table">
+        <thead><tr><th>Numéro</th><th>Type</th><th>IBAN</th><th>RIB</th><th>Solde</th><th>Devise</th><th>Statut</th></tr></thead>
+        <tbody><% accounts.forEach(account => { %><tr>
+          <td><%= account.account_number %></td><td><%= account.account_type %></td><td><%= account.iban || '-' %></td><td><%= account.rib || '-' %></td>
+          <td><%= parseFloat(account.balance).toLocaleString('fr-FR', {minimumFractionDigits: 2}) %></td><td><%= account.currency %></td>
+          <td><span class="badge badge-<%= account.status %>"><%= account.status %></span></td>
+        </tr><% }) %></tbody>
+      </table></div></div><% } %>
+
+      <div class="section-title">Demandes du client <a href="/agent/requests" class="btn-link">Voir toutes →</a></div>
+      <% if (requests.length === 0) { %><div class="card empty-state"><p>Aucune demande.</p></div><% } else { %>
+      <div class="table-wrapper" style="margin-bottom:24px;"><div class="table-scroll"><table class="table">
+        <thead><tr><th>Type</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody><% requests.forEach(request => { %><tr>
+          <td><%= request.request_type %></td><td><%= new Date(request.created_at).toLocaleDateString('fr-FR') %></td>
+          <td><span class="badge badge-<%= request.status %>"><%= request.status %></span></td>
+          <td><a class="btn btn-outline btn-sm" href="/agent/requests/<%= request.id %>">Voir</a></td>
+        </tr><% }) %></tbody>
+      </table></div></div><% } %>
+
+      <div class="section-title">Réclamations <a href="/agent/claims" class="btn-link">Voir toutes →</a></div>
+      <% if (complaints.length === 0) { %><div class="card empty-state"><p>Aucune réclamation.</p></div><% } else { %>
+      <div class="table-wrapper"><div class="table-scroll"><table class="table">
+        <thead><tr><th>Sujet</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody><% complaints.forEach(complaint => { %><tr>
+          <td><%= complaint.subject %></td><td><%= new Date(complaint.created_at).toLocaleDateString('fr-FR') %></td>
+          <td><span class="badge badge-<%= complaint.status %>"><%= complaint.status %></span></td>
+          <td><a class="btn btn-outline btn-sm" href="/agent/claims/<%= complaint.id %>">Voir</a></td>
+        </tr><% }) %></tbody>
+      </table></div></div><% } %>
+    </main>
+  </div>
+</div></body>
+</html>

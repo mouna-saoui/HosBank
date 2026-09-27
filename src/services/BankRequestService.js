@@ -1,5 +1,6 @@
 const BankRequestRepository = require("../repositories/BankRequestRepository");
 const AccountRepository = require("../repositories/AccountRepository");
+const EmailService = require("./EmailService");
 
 // US-11 : Demande ouverture compte épargne
 async function requestSavingsAccount(userId) {
@@ -87,6 +88,38 @@ async function updateRequestStatus(id, status, officerId, resolutionNote) {
     if (request.request_type === "savings_account" && status === "approved") {
         const AccountService = require("./AccountService");
         await AccountService.createAccount(request.user_id, "savings");
+    }
+
+    // Si demande carte virtuelle approuvée → créer la carte automatiquement
+    if (request.request_type === "virtual_card" && status === "approved") {
+        const CardService = require("./CardService");
+        const accountId = request.details?.account_id;
+        if (accountId) {
+            await CardService.createApprovedVirtualCard(request.user_id, accountId);
+        }
+    }
+
+    // ── Notifications email ──────────────────────────────
+    const clientEmail = request.email;
+    const clientFirstName = request.first_name || "Client";
+
+    if (clientEmail) {
+        if (status === "approved" || status === "completed") {
+            // Ne pas envoyer deux fois si savings_account passe par approved puis completed
+            EmailService.sendRequestApprovedEmail({
+                toEmail: clientEmail,
+                firstName: clientFirstName,
+                requestType: request.request_type,
+                resolutionNote: resolutionNote || null,
+            }).catch(err => console.error("[EmailService] Erreur envoi email approbation:", err.message));
+        } else if (status === "rejected") {
+            EmailService.sendRequestRejectedEmail({
+                toEmail: clientEmail,
+                firstName: clientFirstName,
+                requestType: request.request_type,
+                resolutionNote: resolutionNote || null,
+            }).catch(err => console.error("[EmailService] Erreur envoi email refus:", err.message));
+        }
     }
 
     return updated;

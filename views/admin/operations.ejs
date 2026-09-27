@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Opérations — HosBank</title><link rel="stylesheet" href="/css/Style.css"></head>
+<body><div class="layout"><%- include('../layouts/sidebar', { userRole, activePage }) %><div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Opérations', userName }) %><main class="page-body">
+  <div class="page-header"><div><h1>Opérations</h1><p class="text-muted">Virements effectués sur la plateforme</p></div></div>
+  <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+  <form class="card" method="GET" action="/admin/operations" style="margin-bottom:24px;">
+    <div class="header-actions">
+      <div class="form-group"><label for="date_from">Du</label><input id="date_from" name="date_from" type="date" value="<%= filters.date_from %>"></div>
+      <div class="form-group"><label for="date_to">Au</label><input id="date_to" name="date_to" type="date" value="<%= filters.date_to %>"></div>
+      <div class="form-group"><label for="client_id">Client associé</label><select id="client_id" name="client_id"><option value="">Tous les clients</option><% clients.forEach(client => { %><option value="<%= client.id %>" <%= String(filters.client_id) === String(client.id) ? 'selected' : '' %>><%= client.first_name %> <%= client.last_name %></option><% }) %></select></div>
+      <div class="form-group"><label for="min_amount">Montant min.</label><input id="min_amount" name="min_amount" type="number" min="0" step="0.01" value="<%= filters.min_amount %>"></div>
+      <div class="form-group"><label for="max_amount">Montant max.</label><input id="max_amount" name="max_amount" type="number" min="0" step="0.01" value="<%= filters.max_amount %>"></div>
+      <button class="btn btn-primary" type="submit">Filtrer</button>
+    </div>
+  </form>
+  <div class="table-wrapper"><div class="table-scroll"><table class="table">
+    <thead><tr><th>Client</th><th>Référence</th><th>Destinataire</th><th>RIB</th><th>Motif</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
+    <tbody><% operations.forEach(operation => { %><tr>
+      <td><%= operation.first_name %> <%= operation.last_name %><br><span class="text-muted"><%= operation.email %></span></td>
+      <td><%= operation.reference %></td><td><%= operation.recipient_name %></td><td><%= operation.recipient_rib || operation.recipient_account || '-' %></td>
+      <td><%= operation.description || '-' %></td><td><%= Number(operation.amount).toLocaleString('fr-FR', {minimumFractionDigits: 2}) %> <%= operation.currency %></td>
+      <td><span class="badge badge-<%= operation.status %>"><%= operation.status %></span></td><td><%= new Date(operation.created_at).toLocaleString('fr-FR') %></td>
+    </tr><% }) %></tbody>
+  </table></div></div>
+</main></div></div></body></html>

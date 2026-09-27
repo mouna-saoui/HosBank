@@ -1,12 +1,11 @@
 const bcrypt = require("bcrypt");
 const AuthRepository = require("../repositories/AuthRepository");
 
-const ROLE_CLIENT = 1;
 const SALT_ROUNDS = 10;
 
 const DASHBOARDS = {
     1: "/client/dashboard",
-    2: "/officer/dashboard",
+    2: "/agent/dashboard",
     3: "/admin/dashboard",
 };
 
@@ -27,7 +26,7 @@ async function register({ firstName, lastName, email, phone, password, confirmPa
     if (existing) throw new Error("Cet email est déjà utilisé.");
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    return AuthRepository.create({ roleId: ROLE_CLIENT, firstName, lastName, email, phone, passwordHash });
+    return AuthRepository.create({ firstName, lastName, email, phone, passwordHash });
 }
 
 module.exports = { login, register };

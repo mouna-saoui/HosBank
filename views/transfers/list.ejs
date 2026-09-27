@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virements — HosBank</title>
+  <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content">
+    <%- include('../layouts/topbar', { pageTitle: 'Virements', userName }) %>
+    <main class="page-body">
+      <div class="page-header">
+        <div><h1>Effectuer un virement</h1><p class="text-muted">Choisissez un compte source et un destinataire.</p></div>
+      </div>
+
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+      <% if (success) { %><div class="alert alert-success">Le virement a été effectué.</div><% } %>
+
+      <section class="form-section" style="margin-bottom:28px;max-width:720px;">
+        <% if (accounts.length === 0) { %>
+          <p class="empty-text">Aucun compte actif n'est disponible pour effectuer un virement.</p>
+        <% } else { %>
+        <form method="POST" action="/virements">
+          <div class="form-group">
+            <label for="source_account_id">Compte source</label>
+            <select id="source_account_id" name="source_account_id" required>
+              <option value="">Choisir un compte</option>
+              <% accounts.forEach(account => { %>
+                <option value="<%= account.id %>" <%= String(formValues.source_account_id || '') === String(account.id) ? 'selected' : '' %>>
+                  <%= account.account_number %> · <%= account.balance %> <%= account.currency %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="beneficiary_id">Bénéficiaire enregistré (facultatif)</label>
+            <select id="beneficiary_id" name="beneficiary_id">
+              <option value="">Saisir plutôt un RIB</option>
+              <% beneficiaries.forEach(beneficiary => { %>
+                <option value="<%= beneficiary.id %>" <%= String(formValues.beneficiary_id || '') === String(beneficiary.id) ? 'selected' : '' %>><%= beneficiary.name %> · <%= beneficiary.rib %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="recipient_rib">Ou RIB destinataire</label>
+            <input id="recipient_rib" name="recipient_rib" type="text" maxlength="50" value="<%= formValues.recipient_rib || '' %>" placeholder="RIB du destinataire">
+          </div>
+          <div class="form-group">
+            <label for="amount">Montant</label>
+            <input id="amount" name="amount" type="number" min="0.01" step="0.01" value="<%= formValues.amount || '' %>" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Motif</label>
+            <textarea id="description" name="description" maxlength="255" rows="3" required><%= formValues.description || '' %></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Effectuer le virement</button>
+        </form>
+        <% } %>
+      </section>
+
+      <div class="section-title">Historique des virements</div>
+      <% if (history.length === 0) { %>
+        <div class="card empty-state"><p>Aucun virement envoyé ou reçu.</p></div>
+      <% } else { %>
+      <div class="table-wrapper"><div class="table-scroll">
+        <table class="table">
+          <thead><tr><th>Type</th><th>Montant</th><th>Destinataire / Émetteur</th><th>RIB</th><th>Date</th><th>Statut</th></tr></thead>
+          <tbody><% history.forEach(transfer => { %><tr>
+            <td><%= transfer.direction %></td>
+            <td><%= Number(transfer.amount).toLocaleString('fr-FR', {minimumFractionDigits: 2}) %> <%= transfer.currency %></td>
+            <td><%= transfer.other_party %></td><td><%= transfer.other_rib || '-' %></td>
+            <td><%= new Date(transfer.created_at).toLocaleString('fr-FR') %></td>
+            <td><span class="badge badge-<%= transfer.status %>"><%= transfer.status %></span></td>
+          </tr><% }) %></tbody>
+        </table>
+      </div></div>
+      <% } %>
+    </main>
+  </div>
+</div>
+</body>
+</html>

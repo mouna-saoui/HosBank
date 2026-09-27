@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Administrateur — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Dashboard Administrateur', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><h1>Dashboard Administrateur</h1><p class="text-muted">Vue générale de la plateforme HosBank</p></div></div>
+      <div class="stats-row">
+        <a class="stat-card" href="/admin/users"><div class="stat-label">Utilisateurs</div><div class="stat-value"><%= stats.users %></div></a>
+        <a class="stat-card" href="/admin/users?role_id=1"><div class="stat-label">Clients</div><div class="stat-value"><%= stats.clients %></div></a>
+        <a class="stat-card" href="/admin/users?role_id=2"><div class="stat-label">Chargés Clients</div><div class="stat-value"><%= stats.agents %></div></a>
+        <a class="stat-card" href="/admin/accounts"><div class="stat-label">Comptes</div><div class="stat-value"><%= stats.accounts %></div><div class="stat-sub"><%= stats.activeAccounts %> actifs</div></a>
+        <a class="stat-card" href="/admin/cards"><div class="stat-label">Cartes</div><div class="stat-value"><%= stats.cards %></div></a>
+        <a class="stat-card" href="/admin/operations"><div class="stat-label">Opérations</div><div class="stat-value"><%= stats.operations %></div></a>
+        <a class="stat-card" href="/admin/requests?status=pending"><div class="stat-label">Demandes en attente</div><div class="stat-value"><%= stats.pendingRequests %></div></a>
+        <a class="stat-card" href="/admin/complaints?status=open"><div class="stat-label">Réclamations</div><div class="stat-value"><%= stats.pendingComplaints %></div></a>
+      </div>
+
+      <div class="dashboard-grid">
+        <section>
+          <div class="section-title">Utilisateurs récents <a class="btn-link" href="/admin/users">Voir tout →</a></div>
+          <div class="table-wrapper"><div class="table-scroll"><table class="table">
+            <thead><tr><th>Utilisateur</th><th>Rôle</th><th>Statut</th></tr></thead>
+            <tbody><% recentUsers.forEach(user => { %><tr>
+              <td><%= user.first_name %> <%= user.last_name %><br><span class="text-muted"><%= user.email %></span></td>
+              <td><%= user.role_name %></td><td><span class="badge badge-<%= user.status %>"><%= user.status %></span></td>
+            </tr><% }) %></tbody>
+          </table></div></div>
+        </section>
+        <section>
+          <div class="section-title">Demandes à suivre <a class="btn-link" href="/admin/requests">Voir tout →</a></div>
+          <div class="table-wrapper"><div class="table-scroll"><table class="table">
+            <thead><tr><th>Client</th><th>Type</th><th>Statut</th></tr></thead>
+            <tbody><% recentRequests.forEach(request => { %><tr>
+              <td><%= request.first_name %> <%= request.last_name %></td><td><%= request.request_type %></td>
+              <td><span class="badge badge-<%= request.status %>"><%= request.status %></span></td>
+            </tr><% }) %></tbody>
+          </table></div></div>
+        </section>
+        <section class="span-2">
+          <div class="section-title">Activité des Chargés Clients <a class="btn-link" href="/admin/assignments">Affectations →</a></div>
+          <div class="table-wrapper"><div class="table-scroll"><table class="table">
+            <thead><tr><th>Chargé Client</th><th>Email</th><th>Clients affectés</th><th>Demandes en cours</th></tr></thead>
+            <tbody><% agentActivity.forEach(agent => { %><tr>
+              <td><%= agent.first_name %> <%= agent.last_name %></td><td><%= agent.email %></td>
+              <td><%= agent.assigned_clients %></td><td><%= agent.pending_requests %></td>
+            </tr><% }) %></tbody>
+          </table></div></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div></body></html>
