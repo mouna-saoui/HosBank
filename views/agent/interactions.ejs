@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historique — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Historique des interactions', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><div><h1>Historique des interactions</h1><p class="text-muted">Actions enregistrées sur vos clients</p></div></div>
+      <% if (interactions.length === 0) { %><div class="card empty-state"><p>Aucune interaction enregistrée.</p></div><% } else { %>
+      <div class="table-wrapper"><div class="table-scroll"><table class="table">
+        <thead><tr><th>Client</th><th>Action</th><th>Date</th></tr></thead>
+        <tbody><% interactions.forEach(interaction => { %><tr>
+          <td><a class="btn-link" href="/agent/clients/<%= interaction.client_id %>"><%= interaction.first_name %> <%= interaction.last_name %></a></td>
+          <td><%= interaction.summary %></td><td><%= new Date(interaction.occurred_at).toLocaleString('fr-FR') %></td>
+        </tr><% }) %></tbody>
+      </table></div></div><% } %>
+    </main>
+  </div>
+</div></body></html>

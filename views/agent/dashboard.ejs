@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord — HosBank</title><link rel="stylesheet" href="/css/Style.css">
+</head>
+<body><div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content"><%- include('../layouts/topbar', { pageTitle: 'Tableau de bord', userName }) %>
+    <main class="page-body">
+      <div class="page-header"><h1>Tableau de bord</h1></div>
+      <div class="stats-row">
+        <a class="stat-card" href="/agent/clients"><div class="stat-label">Clients affectés</div><div class="stat-value"><%= stats.clients %></div></a>
+        <a class="stat-card" href="/agent/requests"><div class="stat-label">Demandes en attente</div><div class="stat-value"><%= stats.pendingRequests %></div></a>
+        <a class="stat-card" href="/agent/requests"><div class="stat-label">Demandes en cours</div><div class="stat-value"><%= stats.inProgressRequests %></div></a>
+        <a class="stat-card" href="/agent/claims"><div class="stat-label">Réclamations en attente</div><div class="stat-value"><%= stats.pendingComplaints %></div></a>
+      </div>
+      <div class="quick-actions">
+        <a class="quick-action" href="/agent/clients"><span class="qa-icon">•</span>Mes clients</a>
+        <a class="quick-action" href="/agent/requests"><span class="qa-icon">•</span>Demandes</a>
+        <a class="quick-action" href="/agent/claims"><span class="qa-icon">•</span>Réclamations</a>
+        <a class="quick-action" href="/agent/interactions"><span class="qa-icon">•</span>Historique</a>
+      </div>
+    </main>
+  </div>
+</div></body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes clients — HosBank</title>
+  <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="layout">
+  <%- include('../layouts/sidebar', { userRole, activePage }) %>
+  <div class="main-content">
+    <%- include('../layouts/topbar', { pageTitle: 'Mes clients', userName }) %>
+    <main class="page-body">
+      <div class="page-header">
+        <div><h1>Mes clients</h1><p class="text-muted">Clients affectés à votre portefeuille</p></div>
+      </div>
+      <% if (clients.length === 0) { %>
+        <div class="card empty-state"><p>Aucun client ne vous est affecté.</p></div>
+      <% } else { %>
+        <div class="table-wrapper"><div class="table-scroll"><table class="table">
+          <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody><% clients.forEach(client => { %><tr>
+            <td><%= client.first_name %></td><td><%= client.last_name %></td><td><%= client.email %></td>
+            <td><%= client.phone || '-' %></td><td><span class="badge badge-<%= client.status %>"><%= client.status %></span></td>
+            <td><a class="btn btn-outline btn-sm" href="/agent/clients/<%= client.id %>">Voir</a></td>
+          </tr><% }) %></tbody>
+        </table></div></div>
+      <% } %>
+    </main>
+  </div>
+</div>
+</body>
+</html>

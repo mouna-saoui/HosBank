@@ -329,7 +329,9 @@ button, input, select, textarea { font: inherit; }
 }
 .badge-active, .badge-approved, .badge-completed { background: #e6f4ea; color: #1a7a3a; }
 .badge-pending { background: #e8f2fb; color: #1a5a8a; }
-.badge-in_review { background: #e8f2fb; color: #1a5a8a; }
+.badge-in_review, .badge-in_progress { background: #e8f2fb; color: #1a5a8a; }
+.badge-open { background: #e8f2fb; color: #1a5a8a; }
+
 .badge-blocked, .badge-rejected, .badge-cancelled { background: #fdf0ed; color: var(--warm); }
 .badge-expired { background: #f5f5f5; color: var(--secondary); }
 .badge-virtual { background: var(--accent-light); color: var(--primary); }

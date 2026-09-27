@@ -22,6 +22,8 @@ router.get("/logout", authController.logout);
 
 // Client dashboard
 router.get("/client/dashboard", clientOnly, clientController.dashboard);
+router.get("/virements", clientOnly, transferController.showTransfers);
+router.post("/virements", clientOnly, transferController.createTransfer);
 
 // US-11 : Comptes bancaires (client)
 router.get("/accounts", clientOnly, compteController.listAccounts);
