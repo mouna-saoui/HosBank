@@ -9,10 +9,11 @@
 <body>
 <div class="container">
     <div class="page-header">
-        <h1>Demandes : <%= type === 'rib' ? 'RIB' : type === 'savings_account' ? 'Compte Épargne' : type %></h1>
+        <h1>Demandes : <%= type === 'rib' ? 'RIB' : type === 'savings_account' ? 'Compte Épargne' : type === 'virtual_card' ? 'Carte Virtuelle' : type %></h1>
         <div class="header-actions">
             <a href="/officer/requests/rib" class="btn-secondary">RIB</a>
             <a href="/officer/requests/savings_account" class="btn-secondary">Épargne</a>
+            <a href="/officer/requests/virtual_card" class="btn-secondary">Carte Virtuelle</a>
             <a href="/officer/cards" class="btn-secondary">Cartes</a>
             <a href="/logout" class="btn-link">Déconnexion</a>
         </div>
