@@ -1,7 +1,8 @@
 const CardRepository = require("../repositories/CardRepository");
 const AccountRepository = require("../repositories/AccountRepository");
+const BankRequestRepository = require("../repositories/BankRequestRepository");
 
-// US-16 : Demander carte virtuelle
+// US-16 : Demander carte virtuelle (client → crée une bank_request en attente d'approbation)
 async function requestVirtualCard(userId, accountId) {
     const account = await AccountRepository.findById(accountId, userId);
     if (!account) throw new Error("Compte introuvable.");
@@ -13,6 +14,23 @@ async function requestVirtualCard(userId, accountId) {
     );
     if (hasActiveVirtual) throw new Error("Une carte virtuelle active existe déjà pour ce compte.");
 
+    // Vérifier s'il y a déjà une demande en cours pour ce compte
+    const pending = await BankRequestRepository.findByUserIdAndType(userId, "virtual_card");
+    const hasPending = pending.some(
+        r => ["pending", "in_review"].includes(r.status) && r.details?.account_id == accountId
+    );
+    if (hasPending) throw new Error("Une demande de carte virtuelle est déjà en cours pour ce compte.");
+
+    // Créer la bank_request (pas la carte directement)
+    return BankRequestRepository.create({
+        userId,
+        requestType: "virtual_card",
+        details: { account_id: accountId, account_number: account.accountNumber },
+    });
+}
+
+// Appelé automatiquement par BankRequestService quand la demande est approuvée
+async function createApprovedVirtualCard(userId, accountId) {
     const now = new Date();
     const expiryYear = now.getFullYear() + 3;
     const expiryMonth = now.getMonth() + 1;
@@ -21,7 +39,6 @@ async function requestVirtualCard(userId, accountId) {
 
     const card = await CardRepository.create({ userId, accountId, cardType: "virtual" });
 
-    // Mettre à jour les détails générés
     const pool = require("../config/Database");
     const { rows } = await pool.query(
         `UPDATE cards SET last_four = $1, card_token = $2, expiry_month = $3, expiry_year = $4
@@ -79,6 +96,7 @@ async function getAllCards() {
 
 module.exports = {
     requestVirtualCard,
+    createApprovedVirtualCard,
     getCards,
     getCardById,
     blockCard,

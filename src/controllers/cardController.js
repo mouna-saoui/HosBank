@@ -1,5 +1,6 @@
 const CardService = require("../services/CardService");
 const AccountRepository = require("../repositories/AccountRepository");
+const BankRequestRepository = require("../repositories/BankRequestRepository");
 
 // ── CLIENT ──────────────────────────────────────────────
 
@@ -23,16 +24,25 @@ async function showCardDetail(req, res) {
 
 async function showRequestVirtualCardForm(req, res) {
     const accounts = await AccountRepository.findByUserId(req.session.userId);
-    res.render("cards/request", { accounts, error: null });
+    const pendingRequests = await BankRequestRepository.findByUserIdAndType(req.session.userId, "virtual_card");
+    res.render("cards/request", { accounts, pendingRequests, error: null, success: null });
 }
 
 async function requestVirtualCard(req, res) {
     try {
         await CardService.requestVirtualCard(req.session.userId, req.body.account_id);
-        res.redirect("/cards");
+        const accounts = await AccountRepository.findByUserId(req.session.userId);
+        const pendingRequests = await BankRequestRepository.findByUserIdAndType(req.session.userId, "virtual_card");
+        res.render("cards/request", {
+            accounts,
+            pendingRequests,
+            error: null,
+            success: "Votre demande de carte virtuelle a été soumise avec succès. Un chargé client va traiter votre demande.",
+        });
     } catch (err) {
         const accounts = await AccountRepository.findByUserId(req.session.userId);
-        res.render("cards/request", { accounts, error: err.message });
+        const pendingRequests = await BankRequestRepository.findByUserIdAndType(req.session.userId, "virtual_card");
+        res.render("cards/request", { accounts, pendingRequests, error: err.message, success: null });
     }
 }
 

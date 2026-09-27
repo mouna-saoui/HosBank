@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes reclamations - HosBank</title>
+  <link rel="stylesheet" href="/css/Style.css">
+</head>
+<body>
+<div class="layout">
+  <%- include('../layouts/sidebar', { userRole: 1, activePage: 'complaints' }) %>
+  <div class="main-content">
+    <%- include('../layouts/topbar', { pageTitle: 'Mes reclamations', userName: '' }) %>
+    <main class="page-body">
+
+      <div class="page-header">
+        <h2 style="margin:0;font-size:1.1rem;font-weight:700;color:var(--primary);">Mes reclamations</h2>
+        <a href="/complaints/new" class="btn btn-primary" id="btn-new-complaint">+ Nouvelle reclamation</a>
+      </div>
+
+      <% if (typeof req !== 'undefined' && req.query && req.query.success) { %>
+        <div class="alert alert-success">&#x2705; Votre reclamation a ete soumise avec succes. Un charge client va la traiter.</div>
+      <% } %>
+      <% if (error) { %><div class="alert alert-error">&#x26A0;&#xFE0F; <%= error %></div><% } %>
+
+      <% if (complaints.length === 0) { %>
+        <div class="card" style="text-align:center;padding:48px 24px;">
+          <div style="font-size:48px;margin-bottom:16px;">&#x1F4AC;</div>
+          <p style="color:var(--text-muted);font-size:0.95rem;">Vous n'avez aucune reclamation pour le moment.</p>
+          <a href="/complaints/new" class="btn btn-primary" style="margin-top:16px;">Soumettre une reclamation</a>
+        </div>
+      <% } else { %>
+        <div class="table-wrapper">
+          <div class="table-scroll">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Sujet</th>
+                  <th>Priorite</th>
+                  <th>Statut</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% complaints.forEach(c => { %>
+                <tr>
+                  <td style="color:var(--text-muted);font-size:0.82rem;">#<%= c.id %></td>
+                  <td style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= c.subject %></td>
+                  <td>
+                    <span class="badge badge-<%= c.priority === 'urgent' ? 'rejected' : c.priority === 'high' ? 'in_review' : c.priority === 'normal' ? 'pending' : 'completed' %>">
+                      <%= c.priority === 'urgent' ? '&#x1F525; Urgent' : c.priority === 'high' ? '&#x26A0; Haute' : c.priority === 'normal' ? 'Normale' : 'Basse' %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge badge-<%= c.status === 'open' ? 'pending' : c.status === 'in_progress' ? 'in_review' : c.status === 'resolved' ? 'completed' : 'cancelled' %>">
+                      <%= c.status === 'open' ? 'Ouverte' : c.status === 'in_progress' ? 'En cours' : c.status === 'resolved' ? 'Resolue' : 'Fermee' %>
+                    </span>
+                  </td>
+                  <td style="white-space:nowrap;color:var(--text-muted);font-size:0.82rem;"><%= new Date(c.created_at).toLocaleDateString('fr-FR') %></td>
+                  <td><a href="/complaints/<%= c.id %>" class="btn-secondary" style="font-size:0.82rem;padding:6px 14px;">Voir</a></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } %>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>
